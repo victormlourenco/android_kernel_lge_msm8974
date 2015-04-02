@@ -424,7 +424,12 @@ obj-$(CONFIG_WALL_CLK_SYSFS) += wallclk_sysfs.o
 obj-$(CONFIG_HAS_MACH_MEMUTILS) += memutils/
 obj-$(CONFIG_ARCH_RANDOM) += early_random.o
 obj-$(CONFIG_PERFMAP) += perfmap.o
+<<<<<<< HEAD
 
 obj-$(CONFIG_ARCH_MSM8974) += lge_moca_drv.o
 
 obj-$(CONFIG_ALUCARD_HOTPLUG) += alucard_hotplug.o
+=======
+obj-$(CONFIG_MSM_LIMITER) += msm_limiter.o
+obj-$(CONFIG_MSM_HOTPLUG) += msm_hotplug.o
+>>>>>>> 79b69d8... msm: Add MSM hotplug driver
