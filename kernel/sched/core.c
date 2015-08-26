@@ -5312,8 +5312,6 @@ done:
 fail:
 	double_rq_unlock(rq_src, rq_dest);
 
-	notify = task_notify_on_migrate(p);
-
 	raw_spin_unlock(&p->pi_lock);
 	if (moved && task_notify_on_migrate(p)) {
 		struct migration_notify_data mnd;
