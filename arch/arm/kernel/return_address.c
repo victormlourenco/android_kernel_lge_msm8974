@@ -1,3 +1,4 @@
+
 /*
  * arch/arm/kernel/return_address.c
  *
@@ -56,13 +57,5 @@ void *return_address(unsigned int level)
 		return NULL;
 }
 
-#else /* if defined(CONFIG_FRAME_POINTER) && !defined(CONFIG_ARM_UNWIND) */
-
-void *return_address(unsigned int level)
-{
-	return NULL;
-}
-
-#endif /* if defined(CONFIG_FRAME_POINTER) && !defined(CONFIG_ARM_UNWIND) / else */
-
 EXPORT_SYMBOL_GPL(return_address);
+#endif /* if defined(CONFIG_FRAME_POINTER) && !defined(CONFIG_ARM_UNWIND) / else */
