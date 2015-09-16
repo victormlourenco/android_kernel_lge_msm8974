@@ -128,7 +128,11 @@ static ssize_t store_sampling_rate(struct kobject *a, struct attribute *b,
 				   const char *buf, size_t count)
 {
 	int input;
-	int ret;
+	int ret = 0;
+	int mpd = strcmp(current->comm, "mpdecision");
+
+	if (mpd == 0)
+		return ret;
 
 	ret = sscanf(buf, "%u", &input);
 	if (ret != 1)
@@ -510,12 +514,10 @@ static void nightmare_check_cpu(struct cpufreq_nightmare_cpuinfo *this_nightmare
 
 		wall_time = (unsigned int)
 			(cur_wall_time - j_nightmare_cpuinfo->prev_cpu_wall);
-
 		j_nightmare_cpuinfo->prev_cpu_wall = cur_wall_time;
 
 		idle_time = (unsigned int)
 			(cur_idle_time - j_nightmare_cpuinfo->prev_cpu_idle);
-
 		j_nightmare_cpuinfo->prev_cpu_idle = cur_idle_time;
 
 		if (unlikely(!wall_time || wall_time < idle_time))
@@ -581,7 +583,7 @@ static void do_nightmare_timer(struct work_struct *work)
 static int cpufreq_governor_nightmare(struct cpufreq_policy *policy,
 				unsigned int event)
 {
-	struct cpufreq_nightmare_cpuinfo *this_nightmare_cpuinfo = &per_cpu(od_nightmare_cpuinfo, policy->cpu);
+	struct cpufreq_nightmare_cpuinfo *this_nightmare_cpuinfo;
 	unsigned int cpu = policy->cpu, j;
 	int io_busy = nightmare_tuners_ins.io_is_busy;
 	int rc, delay;
@@ -666,12 +668,8 @@ static int cpufreq_governor_nightmare(struct cpufreq_policy *policy,
 			return -EPERM;
 		}
 		mutex_lock(&this_nightmare_cpuinfo->timer_mutex);
-		if (policy->max < this_nightmare_cpuinfo->cur_policy->cur)
-			__cpufreq_driver_target(this_nightmare_cpuinfo->cur_policy,
-				policy->max, CPUFREQ_RELATION_H);
-		else if (policy->min > this_nightmare_cpuinfo->cur_policy->cur)
-			__cpufreq_driver_target(this_nightmare_cpuinfo->cur_policy,
-				policy->min, CPUFREQ_RELATION_L);
+		__cpufreq_driver_target(this_nightmare_cpuinfo->cur_policy,
+				policy->cur, CPUFREQ_RELATION_L);
 		mutex_unlock(&this_nightmare_cpuinfo->timer_mutex);
 
 		break;
