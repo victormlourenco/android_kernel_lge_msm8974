@@ -2,7 +2,7 @@ if [ $# -gt 0 ]; then
 echo $1 > .version
 fi
  
-make ARCH=arm CROSS_COMPILE=/home/victor/UBERTC/bin/arm-linux-androideabi- zImage -j6
+make ARCH=arm CROSS_COMPILE=/home/victor/UBERTC/arm-linux-androideabi-5.2/bin/arm-linux-androideabi- zImage -j6
  
 cp arch/arm/boot/zImage ~/anykernel_d802/
  
