@@ -33,8 +33,11 @@
 #define MAX_ONLINE		(4)
 #define DEF_DOWN_TIMER_CNT	(6)	/* 3 secs */
 #define DEF_UP_TIMER_CNT	(2)	/* 1 sec */
-#define MAX_CORES_SCREENOFF (2)
+#define MAX_CORES_SCREENOFF (4)
 #define DEF_PLUG_THRESHOLD 0
+#define BLU_PLUG_ENABLED	(0)
+
+static unsigned int blu_plug_enabled = BLU_PLUG_ENABLED;
 
 static unsigned int up_threshold = UP_THRESHOLD;;
 static unsigned int delay = DELAY;
@@ -395,6 +398,9 @@ module_param_array(plug_threshold, uint, NULL, 0644);
 
 static int __init dyn_hp_init(void)
 {
+	if (!blu_plug_enabled) {
+		return 0;
+	}
 	notify.notifier_call = fb_notifier_callback;
 	if (fb_register_client(&notify) != 0)
 		pr_info("%s: Failed to register FB notifier callback\n", __func__);
@@ -421,6 +427,38 @@ static void __exit dyn_hp_exit(void)
 	
 	pr_info("%s: deactivated\n", __func__);
 }
+
+/* enabled */
+static int set_enabled(const char *val, const struct kernel_param *kp)
+{
+	int ret = 0;
+	unsigned int i;
+	int blu = 0;
+
+	ret = kstrtouint(val, 10, &i);
+	if (ret)
+		return -EINVAL;
+	if (i < 0 || i > 1)
+		return 0;
+		
+	if (i == blu_plug_enabled)
+		return i;
+
+	ret = param_set_uint(val, kp);
+	blu_plug_enabled = i;
+	if ((blu_plug_enabled == 1))
+		blu = dyn_hp_init();
+	if ((blu_plug_enabled == 0))
+		dyn_hp_exit();
+	return i;
+}
+
+static struct kernel_param_ops enabled_ops = {
+	.set = set_enabled,
+	.get = param_get_uint,
+};
+
+module_param_cb(enabled, &enabled_ops, &blu_plug_enabled, 0644);
 
 MODULE_AUTHOR("Stratos Karafotis <stratosk@semaphore.gr");
 MODULE_AUTHOR("engstk <eng.stk@sapo.pt>");
