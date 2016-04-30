@@ -396,7 +396,7 @@ module_param_array(plug_threshold, uint, NULL, 0644);
 
 /***************** end of module parameters *****************/
 
-static int __init dyn_hp_init(void)
+static int dyn_hp_init(void)
 {
 	if (!blu_plug_enabled) {
 		return 0;
@@ -419,7 +419,7 @@ static int __init dyn_hp_init(void)
 	return 0;
 }
 
-static void __exit dyn_hp_exit(void)
+static void dyn_hp_exit(void)
 {
 	cancel_delayed_work_sync(&dyn_work);
 	fb_unregister_client(&notify);
